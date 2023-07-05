@@ -290,10 +290,6 @@ const cn = {
       Journey: {
         Title: "是否作为绘画",
         SubTitle: "设置后只作为绘画",
-        // Send: "绘画Send",
-        // Copy: "绘画Copy",
-        // Reset: "[unused]",
-        // ResetConfirm: "绘画ResetConfirm",
       },
     },
   },

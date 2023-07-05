@@ -281,6 +281,10 @@ const en: RequiredLocaleType = {
         Title: "Hide Context Prompts",
         SubTitle: "Do not show in-context prompts in chat",
       },
+      Journey: {
+        Title: "As a painting or not",
+        SubTitle: "After setting, only use as painting",
+      },
     },
   },
   NewChat: {
