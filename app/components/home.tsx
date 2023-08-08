@@ -24,7 +24,6 @@ import {
 import { SideBar } from "./sidebar";
 import { useAppConfig } from "../store/config";
 import { AuthPage } from "./auth";
-import { getClientConfig } from "../config/client";
 
 export function Loading(props: { noLogo?: boolean }) {
   return (
@@ -104,8 +103,8 @@ function Screen() {
   const config = useAppConfig();
   const location = useLocation();
   const isHome = location.pathname === Path.Home;
-  const isAuth = location.pathname === Path.Auth;
   const isMobileScreen = useMobileScreen();
+  const isAuth = location.pathname === Path.Auth;
 
   useEffect(() => {
     loadAsyncGoogleFont();
@@ -147,10 +146,6 @@ function Screen() {
 
 export function Home() {
   useSwitchTheme();
-
-  useEffect(() => {
-    console.log("[Config] got config from build time", getClientConfig());
-  }, []);
 
   if (!useHasHydrated()) {
     return <Loading />;

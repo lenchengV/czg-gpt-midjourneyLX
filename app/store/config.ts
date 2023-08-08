@@ -37,7 +37,7 @@ export const DEFAULT_CONFIG = {
     sendMemory: true,
     historyMessageCount: 4,
     compressMessageLengthThreshold: 1000,
-    roleNumber: 1,
+    // isJourney:false
   },
 };
 
@@ -62,10 +62,6 @@ export const ALL_MODELS = [
     available: ENABLE_GPT4,
   },
   {
-    name: "gpt-4-0613",
-    available: ENABLE_GPT4,
-  },
-  {
     name: "gpt-4-32k",
     available: ENABLE_GPT4,
   },
@@ -74,8 +70,20 @@ export const ALL_MODELS = [
     available: ENABLE_GPT4,
   },
   {
+    name: "gpt-4-mobile",
+    available: ENABLE_GPT4,
+  },
+  {
+    name: "gpt-4-0613",
+    available: ENABLE_GPT4,
+  },
+  {
     name: "gpt-4-32k-0613",
     available: ENABLE_GPT4,
+  },
+  {
+    name: "text-davinci-002-render-sha-mobile",
+    available: true,
   },
   {
     name: "gpt-3.5-turbo",
@@ -91,6 +99,10 @@ export const ALL_MODELS = [
   },
   {
     name: "gpt-3.5-turbo-16k",
+    available: true,
+  },
+  {
+    name: "gpt-3.5-turbo-16k-0613",
     available: true,
   },
   {
@@ -113,6 +125,10 @@ export const ALL_MODELS = [
     name: "chatglm", // chatglm-6b
     available: false,
   },
+  {
+    name: "midjourney", // midjourney
+    available: true,
+  },
 ] as const;
 
 export type ModelType = (typeof ALL_MODELS)[number]["name"];
@@ -133,7 +149,7 @@ export function limitNumber(
 export function limitModel(name: string) {
   return ALL_MODELS.some((m) => m.name === name && m.available)
     ? name
-    : "gpt-3.5-turbo";
+    : ALL_MODELS[4].name;
 }
 
 export const ModalConfigValidator = {
@@ -175,9 +191,10 @@ export const useAppConfig = create<ChatConfigStore>()(
         const state = persistedState as ChatConfig;
         state.modelConfig.sendMemory = true;
         state.modelConfig.historyMessageCount = 4;
-        state.modelConfig.roleNumber = 1;
         state.modelConfig.compressMessageLengthThreshold = 1000;
         state.dontShowMaskSplashScreen = false;
+        // state.modelConfig.isJourney = false;
+
         return state;
       },
     },

@@ -33,7 +33,6 @@ export function ModelConfigList(props: {
         title={Locale.Settings.Temperature.Title}
         subTitle={Locale.Settings.Temperature.SubTitle}
       >
-        
         <InputRange
           value={props.modelConfig.temperature?.toFixed(1)}
           min="0"
@@ -136,6 +135,19 @@ export function ModelConfigList(props: {
           }
         ></input>
       </ListItem>
+      {/* <div id="jouneyBox">
+      <ListItem title={Locale.Journey.Title} subTitle={Locale.Journey.Send}>
+        <input
+          type="checkbox"
+          checked={props.modelConfig.isJourney}
+          onChange={(e) =>
+            props.updateConfig(
+              (config) => (config.isJourney = e.currentTarget.checked),
+            )
+          }
+        ></input>
+      </ListItem>
+      </div> */}
     </>
   );
 }

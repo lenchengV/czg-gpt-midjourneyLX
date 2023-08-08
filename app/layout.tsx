@@ -3,11 +3,12 @@ import "./styles/globals.scss";
 import "./styles/markdown.scss";
 import "./styles/highlight.scss";
 import { getBuildConfig } from "./config/build";
-import { getClientConfig } from "./config/client";
+
+const buildConfig = getBuildConfig();
 
 export const metadata = {
-  title: "ChatGPT Next Web",
-  description: "Your personal ChatGPT Chat Bot.",
+  title: "CZG-AutoProAdviser",
+  description: "Your personal AutoProAdviser Chat Bot.",
   viewport: {
     width: "device-width",
     initialScale: 1,
@@ -18,7 +19,7 @@ export const metadata = {
     { media: "(prefers-color-scheme: dark)", color: "#151515" },
   ],
   appleWebApp: {
-    title: "ChatGPT Next Web",
+    title: "CZG-AutoProAdviser",
     statusBarStyle: "default",
   },
 };
@@ -28,14 +29,10 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  
   return (
-   
     <html lang="en">
       <head>
-        <meta name="config" content={JSON.stringify(getClientConfig())} />
-        <meta name="referrer" content="no-referrer" />
-
+        <meta name="version" content={buildConfig.commitId} />
         <link rel="manifest" href="/site.webmanifest"></link>
         <script src="/serviceWorkerRegister.js" defer></script>
       </head>

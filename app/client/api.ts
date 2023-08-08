@@ -1,5 +1,5 @@
 import { ACCESS_CODE_PREFIX } from "../constant";
-import { ChatMessage, ModelType, useAccessStore } from "../store";
+import { ChatMessage, ModelConfig, ModelType, useAccessStore } from "../store";
 import { ChatGPTApi } from "./platforms/openai";
 
 export const ROLES = ["system", "user", "assistant"] as const;
@@ -25,6 +25,7 @@ export interface LLMConfig {
 export interface ChatOptions {
   messages: RequestMessage[];
   config: LLMConfig;
+  Journey:boolean;
 
   onUpdate?: (message: string, chunk: string) => void;
   onFinish: (message: string) => void;
@@ -40,27 +41,6 @@ export interface LLMUsage {
 export abstract class LLMApi {
   abstract chat(options: ChatOptions): Promise<void>;
   abstract usage(): Promise<LLMUsage>;
-}
-
-type ProviderName = "openai" | "azure" | "claude" | "palm";
-
-interface Model {
-  name: string;
-  provider: ProviderName;
-  ctxlen: number;
-}
-
-interface ChatProvider {
-  name: ProviderName;
-  apiConfig: {
-    baseUrl: string;
-    apiKey: string;
-    summaryModel: Model;
-  };
-  models: Model[];
-
-  chat: () => void;
-  usage: () => void;
 }
 
 export class ClientApi {
@@ -116,7 +96,6 @@ export const api = new ClientApi();
 
 export function getHeaders() {
   const accessStore = useAccessStore.getState();
-  console.log('useAccessStore',useAccessStore.getState())
   let headers: Record<string, string> = {
     "Content-Type": "application/json",
     "x-requested-with": "XMLHttpRequest",
@@ -137,5 +116,20 @@ export function getHeaders() {
     );
   }
 
+  if(validString(accessStore.midjourneyProxyUrl)){
+    headers["midjourney-proxy-url"] = accessStore.midjourneyProxyUrl;
+  }
+
   return headers;
+}
+
+export function useGetMidjourneySelfProxyUrl(url:string){
+  const accessStore = useAccessStore.getState();
+  if(accessStore.useMjImgSelfProxy){
+    url = url.replace("https://cdn.discordapp.com", "/api/cnd-discordapp")
+    if(accessStore.accessCode){
+      url += (url.includes("?") ? "&" : "?") + "Authorization=" + accessStore.accessCode;
+    }
+  }
+  return url
 }

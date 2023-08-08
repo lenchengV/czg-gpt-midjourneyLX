@@ -47,6 +47,7 @@ export const createEmptyMask = () =>
     modelConfig: { ...useAppConfig.getState().modelConfig },
     lang: getLang(),
     builtin: false,
+    isJourney: false,
   } as Mask);
 
 export const useMaskStore = create<MaskStore>()(

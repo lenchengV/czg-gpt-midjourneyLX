@@ -2,32 +2,6 @@ import { BuiltinMask } from "./typing";
 
 export const EN_MASKS: BuiltinMask[] = [
   {
-    newRole:[],
-    avatar: "1f978",
-    name: "many play",
-    context: [
-      {
-        role: "user",
-        content:
-          "我想让你担任机器学习工程师。我会写一些机器学习的概念，你的工作就是用通俗易懂的术语来解释它们。这可能包括提供构建模型的分步说明、给出所用的技术或者理论、提供评估函数等。我的问题是",
-        date: "",
-      },
-    ],
-    modelConfig: {
-      model: "gpt-3.5-turbo",
-      temperature: 1,
-      max_tokens: 2000,
-      presence_penalty: 0,
-      sendMemory: true,
-      historyMessageCount: 4,
-      compressMessageLengthThreshold: 1000,
-      roleNumber: 1,
-    },
-    lang: "en",
-    builtin: true,
-  },
-  {
-    newRole:[],
     avatar: "1f47e",
     name: "GitHub Copilot",
     context: [
@@ -46,13 +20,11 @@ export const EN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      roleNumber: 1,
     },
     lang: "en",
     builtin: true,
   },
   {
-    newRole:[],
     avatar: "1f916",
     name: "Prompt Improvement",
     context: [
@@ -88,13 +60,11 @@ export const EN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      roleNumber: 1,
     },
     lang: "en",
     builtin: true,
   },
   {
-    newRole:[],
     avatar: "2328-fe0f",
     name: "CAN",
     context: [
@@ -113,13 +83,11 @@ export const EN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      roleNumber: 1,
     },
     lang: "en",
     builtin: true,
   },
   {
-    newRole:[],
     avatar: "1f60e",
     name: "Expert",
     context: [
@@ -143,7 +111,6 @@ export const EN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 2000,
-      roleNumber: 1,
     },
     lang: "en",
     builtin: true,

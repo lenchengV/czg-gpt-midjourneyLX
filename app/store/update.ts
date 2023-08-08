@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { FETCH_COMMIT_URL, StoreKey } from "../constant";
 import { api } from "../client/api";
-import { getClientConfig } from "../config/client";
+import { showToast } from "../components/ui-lib";
 
 export interface UpdateStore {
   lastUpdate: number;
@@ -15,6 +15,20 @@ export interface UpdateStore {
   version: string;
   getLatestVersion: (force?: boolean) => Promise<void>;
   updateUsage: (force?: boolean) => Promise<void>;
+}
+
+function queryMeta(key: string, defaultValue?: string): string {
+  let ret: string;
+  if (document) {
+    const meta = document.head.querySelector(
+      `meta[name='${key}']`,
+    ) as HTMLMetaElement;
+    ret = meta?.content ?? "";
+  } else {
+    ret = defaultValue ?? "";
+  }
+
+  return ret;
 }
 
 const ONE_MINUTE = 60 * 1000;
@@ -30,7 +44,7 @@ export const useUpdateStore = create<UpdateStore>()(
       version: "unknown",
 
       async getLatestVersion(force = false) {
-        set(() => ({ version: getClientConfig()?.commitId ?? "unknown" }));
+        set(() => ({ version: queryMeta("version") ?? "unknown" }));
 
         const overTenMins = Date.now() - get().lastUpdate > 10 * ONE_MINUTE;
         if (!force && !overTenMins) return;
@@ -70,7 +84,7 @@ export const useUpdateStore = create<UpdateStore>()(
             }));
           }
         } catch (e) {
-          console.error((e as Error).message);
+          showToast((e as Error).message);
         }
       },
     }),

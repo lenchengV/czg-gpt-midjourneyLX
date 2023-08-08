@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import Fuse from "fuse.js";
 import { getLang } from "../locales";
 import { StoreKey } from "../constant";
-console.log('persist,Fuse,getLang,StoreKey',persist,Fuse,getLang,StoreKey)
+
 export interface Prompt {
   id?: number;
   isUser?: boolean;
@@ -36,7 +36,6 @@ export const SearchService = {
   builtinPrompts: [] as Prompt[],
 
   init(builtinPrompts: Prompt[], userPrompts: Prompt[]) {
-    console.log('初始化预设参数打印',builtinPrompts,'-----',userPrompts)
     if (this.ready) {
       return;
     }
@@ -56,6 +55,9 @@ export const SearchService = {
   },
 
   search(text: string) {
+    if (text.startsWith("mj ")) {
+      return [];
+    }
     const userResults = this.userEngine.search(text);
     const builtinResults = this.builtinEngine.search(text);
     return userResults.concat(builtinResults).map((v) => v.item);

@@ -16,7 +16,6 @@ export function Mermaid(props: { code: string; onError: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    console.log('健康久久',props)
     if (props.code && ref.current) {
       mermaid
         .run({
@@ -108,7 +107,6 @@ function _MarkDownContent(props: { content: string }) {
           const target = isInternal ? "_self" : aProps.target ?? "_blank";
           return <a {...aProps} target={target} />;
         },
-        img: ({ src, alt }) => <img src={src} alt={alt} />,
       }}
     >
       {props.content}

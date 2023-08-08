@@ -58,20 +58,20 @@ export function MaskConfig(props: {
   };
 
   const globalConfig = useAppConfig();
-  // console.log('å°±çœ‹å°±çœ‹è§',props,globalConfig)
+  // console.log('¾Í¿´¾Í¿´¼û',props,globalConfig)
   return (
     <>
       <ContextPrompts
         context={props.mask.context}
         rolearr={props.mask.newRole}
         updateContext={(updater) => {
-          // console.log('æ›´æ–°æµ‹è¯•111',props)
+          // console.log('¸üĞÂ²âÊÔ111',props)
           const context = props.mask.context.slice();
           updater(context);
           props.updateMask((mask) => (mask.context = context));
         }}
         updateRole={(updater) => {
-          // console.log('æ›´æ–°æµ‹è¯•',props)
+          // console.log('¸üĞÂ²âÊÔ',props)
           const newRole = props.mask.newRole.slice();
           updater(newRole);
           props.updateMask((mask) => (mask.newRole = newRole));
@@ -351,7 +351,7 @@ export function ContextPrompts(props: {
 }) {
   const context = props.context;
   const rolearr = props.rolearr;
-  // console.log('propsæ‰“å°',props,context)
+  // console.log('props´òÓ¡',props,context)
 
 
   const addContextRole = (prompt: newRole) => {
@@ -362,7 +362,7 @@ export function ContextPrompts(props: {
   };
   const updateContextRole = (i: number, prompt: newRole) => {
     props.updateRole((rolearr) => (rolearr[i] = prompt));
-    // console.log('è¾“å…¥çš„æ—¶å€™è§’è‰²æ›´æ–°',props)
+    // console.log('ÊäÈëµÄÊ±ºò½ÇÉ«¸üĞÂ',props)
   };
 
   const addContextPrompt = (prompt: ChatMessage) => {
@@ -406,7 +406,7 @@ export function ContextPrompts(props: {
         </div>
       </div>
 
-      {/* æ–°å¢è§’è‰² */}
+      {/* ĞÂÔö½ÇÉ« */}
 
       <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
         {rolearr.map((c, i) => (
