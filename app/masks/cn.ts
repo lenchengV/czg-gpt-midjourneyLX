@@ -24,6 +24,7 @@ export const CN_MASKS: BuiltinMask[] = [
         date: "",
       },
     ],
+    newRole:[],
     modelConfig: {
       model: "gpt-3.5-turbo",
       temperature: 1,
@@ -32,12 +33,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 32,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f638",
     name: "文案写手",
     context: [
@@ -56,12 +58,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f978",
     name: "机器学习",
     context: [
@@ -80,12 +83,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f69b",
     name: "后勤工作",
     context: [
@@ -104,12 +108,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f469-200d-1f4bc",
     name: "职业顾问",
     context: [
@@ -128,12 +133,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f9d1-200d-1f3eb",
     name: "英专写手",
     context: [
@@ -152,12 +158,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: false,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f4da",
     name: "语言检测器",
     context: [
@@ -176,12 +183,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: false,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f4d5",
     name: "小红书写手",
     context: [
@@ -200,12 +208,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: false,
       historyMessageCount: 0,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f4d1",
     name: "简历写手",
     context: [
@@ -229,12 +238,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f469-200d-2695-fe0f",
     name: "心理医生",
     context: [
@@ -253,12 +263,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f4b8",
     name: "创业点子王",
     context: [
@@ -283,12 +294,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: false,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "270d-fe0f",
     name: "互联网写手",
     context: [
@@ -313,12 +325,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: false,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f63e",
     name: "心灵导师",
     context: [
@@ -364,12 +377,13 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: false,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,
   },
   {
+    newRole:[],
     avatar: "1f513",
     name: "越狱模式 [Jailbreak]",
     context: [
@@ -393,37 +407,7 @@ export const CN_MASKS: BuiltinMask[] = [
       sendMemory: true,
       historyMessageCount: 4,
       compressMessageLengthThreshold: 1000,
-      // isJourney:false
-    },
-    lang: "cn",
-    builtin: true,
-  },
-  {
-    avatar: "1f5bc-fe0f",
-    name: "画图 [Midjourney]",
-    context: [
-      {
-        role: "user",
-        content: "",
-        date: "",
-      },
-      {
-        role: "assistant",
-        content: "",
-        date: "",
-      },
-    ],
-    isJourney: true,
-    hideContext: true,
-    modelConfig: {
-      model: "gpt-4",
-      temperature: 0.5,
-      max_tokens: 2000,
-      presence_penalty: 0,
-      sendMemory: true,
-      historyMessageCount: 4,
-      compressMessageLengthThreshold: 1000,
-      // isJourney:false
+      roleNumber: 1,
     },
     lang: "cn",
     builtin: true,

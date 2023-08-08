@@ -1,4 +1,4 @@
-import { REQUEST_TIMEOUT_MS } from "@/app/constant";
+import { OpenaiPath, REQUEST_TIMEOUT_MS } from "@/app/constant";
 import { useAccessStore, useAppConfig, useChatStore } from "@/app/store";
 
 import { ChatOptions, getHeaders, LLMApi, LLMUsage } from "../api";
@@ -8,12 +8,8 @@ import {
   fetchEventSource,
 } from "@fortaine/fetch-event-source";
 import { prettyObject } from "@/app/utils/format";
-
+import { Client, Events, GatewayIntentBits } from 'discord.js';
 export class ChatGPTApi implements LLMApi {
-  public ChatPath = "v1/chat/completions";
-  public UsagePath = "dashboard/billing/usage";
-  public SubsPath = "dashboard/billing/subscription";
-
   path(path: string): string {
     let openaiUrl = useAccessStore.getState().openaiUrl;
     if (openaiUrl.endsWith("/")) {
@@ -27,6 +23,8 @@ export class ChatGPTApi implements LLMApi {
   }
 
   async chat(options: ChatOptions) {
+    console.log('options',options)
+    // debugger
     const messages = options.messages.map((v) => ({
       role: v.role,
       content: v.content,
@@ -55,7 +53,7 @@ export class ChatGPTApi implements LLMApi {
     options.onController?.(controller);
 
     try {
-      const chatPath = this.path(this.ChatPath);
+      const chatPath = this.path(OpenaiPath.ChatPath);
       const chatPayload = {
         method: "POST",
         body: JSON.stringify(requestPayload),
@@ -75,27 +73,38 @@ export class ChatGPTApi implements LLMApi {
 
         const finish = () => {
           if (!finished) {
+            // console.log('消息完事返回？')
             options.onFinish(responseText);
             finished = true;
           }
         };
 
         controller.signal.onabort = finish;
+        // console.log('消息完事返回？5555',requestPayload.messages)
 
+        let mcont=requestPayload.messages[requestPayload.messages.length-1].content;
+       if(mcont.startsWith("@mj ")){
+        responseText = '![关于这个图片的内容](https://www.jq22.com/demo/jQuery-jdt202009101019/images/d1.png)';
+        return finish();
+       }else{
         fetchEventSource(chatPath, {
           ...chatPayload,
           async onopen(res) {
-            console.log('options',options);
-            
+           
             clearTimeout(requestTimeoutId);
             const contentType = res.headers.get("content-type");
             console.log(
               "[OpenAI] request response content type: ",
               contentType,
             );
-
+            // console.log(
+            //   "我打印的参数",
+            //   chatPayload,
+            // );
+            
             if (contentType?.startsWith("text/plain")) {
               responseText = await res.clone().text();
+              // console.log('结束请求了？',responseText)
               return finish();
             }
 
@@ -107,6 +116,7 @@ export class ChatGPTApi implements LLMApi {
               res.status !== 200
             ) {
               const responseTexts = [responseText];
+              // console.log('结束请求了？',responseText)
               let extraInfo = await res.clone().text();
               try {
                 const resJson = await res.clone().json();
@@ -114,9 +124,8 @@ export class ChatGPTApi implements LLMApi {
               } catch {}
 
               if (res.status === 401) {
-                console.log("还是你？");
+                // console.log('llk',Locale)
                 responseTexts.push(Locale.Error.Unauthorized);
-                
               }
 
               if (extraInfo) {
@@ -129,16 +138,23 @@ export class ChatGPTApi implements LLMApi {
             }
           },
           onmessage(msg) {
+            
             if (msg.data === "[DONE]" || finished) {
               return finish();
             }
             const text = msg.data;
             try {
               const json = JSON.parse(text);
+              // console.log(
+              //   "我打印的请求",
+              //   json
+              // );
               const delta = json.choices[0].delta.content;
+              // console.log()
               if (delta) {
                 responseText += delta;
                 options.onUpdate?.(responseText, delta);
+                // console.log(responseText)
               }
             } catch (e) {
               console.error("[Request] parse error", text, msg);
@@ -153,10 +169,9 @@ export class ChatGPTApi implements LLMApi {
           },
           openWhenHidden: true,
         });
+       }
+        
       } else {
-        // if(options.Journey){
-        //     return options.onUpdate?.("1",)
-        // }
         const res = await fetch(chatPath, chatPayload);
         clearTimeout(requestTimeoutId);
 
@@ -184,22 +199,20 @@ export class ChatGPTApi implements LLMApi {
     const [used, subs] = await Promise.all([
       fetch(
         this.path(
-          `${this.UsagePath}?start_date=${startDate}&end_date=${endDate}`,
+          `${OpenaiPath.UsagePath}?start_date=${startDate}&end_date=${endDate}`,
         ),
         {
           method: "GET",
           headers: getHeaders(),
         },
       ),
-      fetch(this.path(this.SubsPath), {
+      fetch(this.path(OpenaiPath.SubsPath), {
         method: "GET",
         headers: getHeaders(),
       }),
     ]);
 
     if (used.status === 401) {
-      console.log("你？");
-
       throw new Error(Locale.Error.Unauthorized);
     }
 
@@ -237,3 +250,4 @@ export class ChatGPTApi implements LLMApi {
     } as LLMUsage;
   }
 }
+export { OpenaiPath };

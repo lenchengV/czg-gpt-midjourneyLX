@@ -25,7 +25,13 @@ export type ChatMessage = RequestMessage & {
     model?: ModelType;
     attr?: any;
 };
-
+export type newRole = RequestMessage & {
+  date: string;
+  streaming?: boolean;
+  isError?: boolean;
+  id?: number;
+  model?: ModelType;
+};
 export function createMessage(override: Partial<ChatMessage>): ChatMessage {
     return {
         id: Date.now(),
@@ -86,8 +92,11 @@ const ChatFetchTaskPool: Record<string, any> = {}
 interface ChatStore {
     sessions: ChatSession[];
     currentSessionIndex: number;
+	roleIdx: number;//循环到了数组的第几个
+  	roundRole: number;//对话轮数
     globalId: number;
     clearSessions: () => void;
+	doSelf: (index: number) => void;
     moveSession: (from: number, to: number) => void;
     selectSession: (index: number) => void;
     newSession: (mask?: Mask) => void;
@@ -119,7 +128,9 @@ export const useChatStore = create<ChatStore>()(
     persist(
         (set, get) => ({
             sessions: [createEmptySession()],
-            currentSessionIndex: 0,
+			currentSessionIndex: 0,
+      		roleIdx: 0,
+      roundRole: 1,
             globalId: 0,
 
             clearSessions() {
@@ -338,7 +349,151 @@ export const useChatStore = create<ChatStore>()(
                     }
                 }, 3000);
             },
-
+			 doSelf(index) {
+        const session = get().currentSession();
+        const modelConfig = session.mask.modelConfig;
+        const messages = session.messages;
+        // console.log('打印新函数',session)
+       
+        
+        let topicMessages = messages;
+        if(session?.mask?.newRole.length>0){
+          // console.log('打印新函数',session)
+          // session.mask.newRole.map((item, i) => {
+            console.log('接口就回家',get().roleIdx,index,session,get().roleIdx==index)
+            
+            if(get().roleIdx==index){
+              // topicMessages.concat(
+              //   createMessage({
+              //     role: "user",
+              //     content: '作为'+item.content+'角色对上述对话发言，并总结',
+              //   }),
+              // )
+              let content
+              if(index==session.mask.newRole.length){
+                content='你是一个会议秘书，请为以上圆桌会议内容进行总结，简明扼要'
+              
+              }else{
+                content=`作为${session.mask.newRole[index].content}角色对上述对话进行第${get().roundRole}轮发言，并总结`
+              
+              }
+              topicMessages.push(
+                createMessage({
+                  role: "user",
+                  content: content,
+                })
+              )
+              const userMessage: ChatMessage = createMessage({
+                role: "user",
+                content,
+              });
+              const botMessage: ChatMessage = createMessage({
+                role: "assistant",
+                streaming: true,
+                id: userMessage.id! + 1,
+                model: modelConfig.model,
+              });
+              get().updateCurrentSession((session) => {
+                // session.messages.push(userMessage);
+                session.messages.push(botMessage);
+              });
+              // debugger
+              const sessionIndex = get().currentSessionIndex;
+              const messageIndex = get().currentSession().messages.length + 1;
+      
+              // console.log('循环角色', index,topicMessages)
+              api.llm.chat({
+                messages: topicMessages,
+                config: { ...modelConfig, stream: true },
+                onUpdate(message) {
+                  botMessage.streaming = true;
+                  if (message) {
+                    // console.log('更新消息内容',message)
+                    botMessage.content = message;
+                  }
+                  set(() => ({}));
+                },
+                onFinish(message) {
+                  
+                  botMessage.streaming = false;
+                  if (message) {
+                    botMessage.content = message;
+                    get().onNewMessage(botMessage);
+                  }
+                  ChatControllerPool.remove(
+                    sessionIndex,
+                    botMessage.id ?? messageIndex,
+                  );
+                  set(() => ({}));
+                  if(index<session.mask.newRole.length){
+                    if(index<session.mask.newRole.length-1){
+                      set(() => ({
+                        roleIdx:index+1
+                      }));
+                    }else{
+                      console.log('测试打印',index,session.mask.newRole.length,get().roundRole<=modelConfig.roleNumber,get().roundRole,modelConfig.roleNumber)
+                      if(get().roundRole<modelConfig.roleNumber){
+                        set(() => ({
+                          roleIdx:0,
+                          roundRole:get().roundRole+1,
+                        }));
+                      }else{
+                        set(() => ({
+                          roleIdx:index+1
+                        }));
+                      }
+                      
+                    }
+                    if(get().roundRole==modelConfig.roleNumber&&(index==session.mask.newRole.length)){
+                      set(() => ({
+                        roleIdx:index+1,
+                        roundRole:1
+                      }));
+                    }
+                    
+                    
+                    get().doSelf(get().roleIdx)
+                  }
+                },
+                onError(error) {
+                  // console.log('错误打印',error)
+                  const isAborted = error.message.includes("aborted");
+                  botMessage.content =
+                    "\n\n" +
+                    prettyObject({
+                      error: true,
+                      message: error.message,
+                    });
+                  botMessage.streaming = false;
+                  userMessage.isError = !isAborted;
+                  botMessage.isError = !isAborted;
+                  // set(() => ({
+                  //   roleIdx:index+1
+                  // }));
+                  set(() => ({}));
+                  ChatControllerPool.remove(
+                    sessionIndex,
+                    botMessage.id ?? messageIndex,
+                  );
+      
+                  console.error("[Chat] failed ", error);
+                },
+                onController(controller) {
+                  // collect controller for stop/retry
+                  ChatControllerPool.addController(
+                    sessionIndex,
+                    botMessage.id ?? messageIndex,
+                    controller,
+                  );
+                },
+              });
+            }
+          // })
+        }
+        
+        // console.log('打印新函数111111',get().roleIdx)
+      },
+			
             async onUserInput(content, extAttr?: any) {
                 const session = get().currentSession();
                 const modelConfig = session.mask.modelConfig;
@@ -397,9 +552,19 @@ export const useChatStore = create<ChatStore>()(
                 // save user's and bot's message
                 get().updateCurrentSession((session) => {
                     session.messages.push(userMessage);
+					if(session?.mask?.newRole.length>0){
+			            set(() => ({
+			              roleIdx:0,
+			              roundRole:1
+			            }));
+			            get().doSelf(0);
+			            return
+			          }
                     session.messages.push(botMessage);
                 });
-
+				if(session?.mask?.newRole.length>0){
+		          return
+		        }
                 // make request
                 console.log("[User Input] ", sendMessages);
                 if (
@@ -608,6 +773,11 @@ export const useChatStore = create<ChatStore>()(
                                 botMessage.id ?? messageIndex,
                             );
                             set(() => ({}));
+							set(() => ({
+				              roleIdx:0,
+				              roundRole:1
+				            }));
+				            get().doSelf(0);
                         },
                         onError(error) {
                             const isAborted = error.message.includes("aborted");

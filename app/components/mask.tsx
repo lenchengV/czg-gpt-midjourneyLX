@@ -13,7 +13,7 @@ import EyeIcon from "../icons/eye.svg";
 import CopyIcon from "../icons/copy.svg";
 
 import { DEFAULT_MASK_AVATAR, Mask, useMaskStore } from "../store/mask";
-import { ChatMessage, ModelConfig, useAppConfig, useChatStore } from "../store";
+import { ChatMessage, ModelConfig, useAppConfig, useChatStore, newRole} from "../store";
 import { ROLES } from "../client/api";
 import { Input, List, ListItem, Modal, Popover, Select } from "./ui-lib";
 import { Avatar, AvatarPicker } from "./emoji";
@@ -27,7 +27,7 @@ import { Updater } from "../typing";
 import { ModelConfigList } from "./model-config";
 import { FileName, Path } from "../constant";
 import { BUILTIN_MASK_STORE } from "../masks";
-
+import { InputRange } from "./input-range";
 export function MaskAvatar(props: { mask: Mask }) {
   return props.mask.avatar !== DEFAULT_MASK_AVATAR ? (
     <Avatar avatar={props.mask.avatar} />
@@ -58,19 +58,45 @@ export function MaskConfig(props: {
   };
 
   const globalConfig = useAppConfig();
-
+  // console.log('就看就看见',props,globalConfig)
   return (
     <>
       <ContextPrompts
         context={props.mask.context}
+        rolearr={props.mask.newRole}
         updateContext={(updater) => {
+          // console.log('更新测试111',props)
           const context = props.mask.context.slice();
           updater(context);
           props.updateMask((mask) => (mask.context = context));
         }}
+        updateRole={(updater) => {
+          // console.log('更新测试',props)
+          const newRole = props.mask.newRole.slice();
+          updater(newRole);
+          props.updateMask((mask) => (mask.newRole = newRole));
+        }}
       />
 
       <List>
+      {props.mask.newRole.length>0 ? (
+           <ListItem
+           title={Locale.Mask.Role.name}
+           subTitle={Locale.Mask.Role.SubTitle}
+         >
+           <InputRange
+             title={props.mask.modelConfig.roleNumber.toString()}
+             value={props.mask.modelConfig.roleNumber}
+             min="1"
+             max="10"
+             step="1"
+             onChange={(e) =>updateConfig(
+               (config) => (config.roleNumber = e.target.valueAsNumber),
+             )}
+           ></InputRange>
+         </ListItem>
+        ) : null}
+       
         <ListItem title={Locale.Mask.Config.Avatar}>
           <Popover
             content={
@@ -117,21 +143,6 @@ export function MaskConfig(props: {
             }}
           ></input>
         </ListItem>
-        <ListItem
-          title={Locale.Mask.Config.Journey.Title}
-          subTitle={Locale.Mask.Config.Journey.SubTitle}
-        >
-          <input
-            type="checkbox"
-            checked={props.mask.isJourney}
-            onChange={(e) => {
-              props.updateMask((mask) => {
-                mask.isJourney = e.currentTarget.checked;
-                console.log("mask", mask);
-              });
-            }}
-          ></input>
-        </ListItem>
         {props.shouldSyncFromGlobal ? (
           <ListItem
             title={Locale.Mask.Config.Sync.Title}
@@ -172,9 +183,10 @@ function ContextPromptItem(props: {
   update: (prompt: ChatMessage) => void;
   remove: () => void;
 }) {
-  const [focusingInput, setFocusingInput] = useState(false);
-
+  const [focusingInput, setFocusingInput,] = useState(false);
+  
   return (
+    
     <div className={chatStyle["context-prompt-row"]}>
       {!focusingInput && (
         <Select
@@ -220,22 +232,149 @@ function ContextPromptItem(props: {
   );
 }
 
+export function ContextRoleItem(props: {
+  prompt: newRole;
+  update: (prompt: newRole) => void;
+  remove: () => void;
+}) {
+  const [showPicker, setShowPicker] = useState(false);
+  
+  return (
+    <div>
+      <List>
+        <ListItem title={Locale.Mask.Config.Avatar}>
+          <div> 
+            <IconButton
+              icon={<DeleteIcon />}
+              className={chatStyle["context-delete-button"]}
+              onClick={() => props.remove()}
+              bordered
+            />
+          </div>
+          {/* <Popover
+            content={
+              <AvatarPicker
+                onEmojiClick={(emoji) => {
+                  props.update({
+
+                  });
+                  setShowPicker(false);
+                }}
+                onChange={(e) =>
+                  props.update({
+                    ...props.prompt,
+                    role: e.target.value as any,
+                  })
+                }
+              ></AvatarPicker>
+            }
+            open={showPicker}
+            onClose={() => setShowPicker(false)}
+          >
+            <div
+              onClick={() => setShowPicker(true)}
+              style={{ cursor: "pointer" }}
+            >
+              <MaskAvatar mask={props.prompt.role} />
+            </div>
+          </Popover>
+
+          <Popover
+            content={
+              <AvatarPicker
+                onEmojiClick={(emoji) => {
+                  props.updateMask((mask) => (mask.avatar = emoji));
+                  setShowPicker(false);
+                }}
+              ></AvatarPicker>
+            }
+            open={showPicker}
+            onClose={() => setShowPicker(false)}
+          >
+            <div
+              onClick={() => setShowPicker(true)}
+              style={{ cursor: "pointer" }}
+            >
+              <MaskAvatar mask={props.mask} />
+            </div>
+          </Popover> */}
+
+
+
+        {/* <Select
+          value={props.prompt.role}
+          className={chatStyle["context-role"]}
+          onChange={(e) =>
+            props.update({
+              ...props.prompt,
+              role: e.target.value as any,
+            })
+          }
+        >
+          {ROLES.map((r) => (
+            <option key={r} value={r}>
+              {r}
+            </option>
+          ))}
+        </Select> */}
+
+
+
+
+          
+        </ListItem>
+        <ListItem title={Locale.Mask.Config.Name}>
+          <input
+            type="text"
+            value={props.prompt.content}
+            onInput={(e) =>
+              props.update({
+                ...props.prompt,
+                content: e.currentTarget.value as any,
+              })
+            }
+          ></input>
+        </ListItem>
+      </List>
+
+    </div>
+  );
+}
+
+
+
 export function ContextPrompts(props: {
   context: ChatMessage[];
   updateContext: (updater: (context: ChatMessage[]) => void) => void;
+  rolearr: newRole[];
+  updateRole: (updater: (rolearr: newRole[]) => void) => void;
 }) {
   const context = props.context;
+  const rolearr = props.rolearr;
+  // console.log('props打印',props,context)
+
+
+  const addContextRole = (prompt: newRole) => {
+    props.updateRole((rolearr) => rolearr.push(prompt));
+  };
+  const removeContextRole = (i: number) => {
+    props.updateRole((rolearr) => rolearr.splice(i, 1));
+  };
+  const updateContextRole = (i: number, prompt: newRole) => {
+    props.updateRole((rolearr) => (rolearr[i] = prompt));
+    // console.log('输入的时候角色更新',props)
+  };
 
   const addContextPrompt = (prompt: ChatMessage) => {
     props.updateContext((context) => context.push(prompt));
   };
-
   const removeContextPrompt = (i: number) => {
     props.updateContext((context) => context.splice(i, 1));
   };
 
   const updateContextPrompt = (i: number, prompt: ChatMessage) => {
     props.updateContext((context) => (context[i] = prompt));
+    // console.log('jjjkj',props.context)
   };
 
   return (
@@ -265,6 +404,34 @@ export function ContextPrompts(props: {
             }
           />
         </div>
+      </div>
+
+      {/* 新增角色 */}
+
+      <div className={chatStyle["context-prompt"]} style={{ marginBottom: 20 }}>
+        {rolearr.map((c, i) => (
+          <ContextRoleItem
+            key={i}
+            prompt={c}
+            update={(prompt) => updateContextRole(i, prompt)}
+            remove={() => removeContextRole(i)}
+          />
+        ))}
+
+
+          <IconButton
+            icon={<AddIcon />}
+            text={Locale.Context.newRole}
+            bordered
+            className={chatStyle["context-prompt-button"]}
+            onClick={() =>addContextRole({
+              role: "user",
+              content: "",
+              date: "",
+            })
+            }
+          />
+          
       </div>
     </>
   );

@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { BUILTIN_MASKS } from "../masks";
 import { getLang, Lang } from "../locales";
-import { DEFAULT_TOPIC, ChatMessage } from "./chat";
+import { DEFAULT_TOPIC, ChatMessage, newRole } from "./chat";
 import { ModelConfig, ModelType, useAppConfig } from "./config";
 import { StoreKey } from "../constant";
 
@@ -11,8 +11,8 @@ export type Mask = {
   avatar: string;
   name: string;
   hideContext?: boolean;
-  isJourney?: boolean;
   context: ChatMessage[];
+  newRole: newRole[];
   syncGlobalConfig?: boolean;
   modelConfig: ModelConfig;
   lang: Lang;
@@ -42,6 +42,7 @@ export const createEmptyMask = () =>
     avatar: DEFAULT_MASK_AVATAR,
     name: DEFAULT_TOPIC,
     context: [],
+    newRole: [],
     syncGlobalConfig: true, // use global config as default
     modelConfig: { ...useAppConfig.getState().modelConfig },
     lang: getLang(),
